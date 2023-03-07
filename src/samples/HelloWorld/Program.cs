@@ -170,6 +170,7 @@ public static class Program
         return new MeshShapeSettings(triangleVertices, indexedTriangles);
     }
 
+    private static int m_logCount;
     public static unsafe void Main()
     {
         if (!Foundation.Init())
@@ -215,6 +216,7 @@ public static class Program
             bodyInterface.AddBody(floor, ActivationMode.DontActivate);
 
             BodyCreationSettings spherSettings = new(new SphereShape(0.5f), new Vector3(0.0f, 2.0f, 0.0f), Quaternion.Identity, MotionType.Dynamic, Layers.Moving);
+            spherSettings.SetMass(100.0f, 1.0f);
             BodyID sphereID = bodyInterface.CreateAndAddBody(spherSettings, ActivationMode.Activate);
 
             // Now you can interact with the dynamic body, in this case we're going to give it a velocity.
@@ -243,7 +245,7 @@ public static class Program
                 // Output current position and velocity of the sphere
                 Vector3 position = bodyInterface.GetCenterOfMassPosition(sphereID);
                 Vector3 velocity = bodyInterface.GetLinearVelocity(sphereID);
-                Console.WriteLine($"Step {step} : Position = ({position}), Velocity = ({velocity})");
+                Log($"Step {step} : Position = ({position}), Velocity = ({velocity})");
 
                 // If you take larger steps than 1 / 60th of a second you need to do multiple collision steps in order to keep the simulation stable. Do 1 collision step per 1 / 60th of a second (round up).
                 const int collisionSteps = 1;
@@ -272,7 +274,7 @@ public static class Program
 
     private static ValidateResult OnContactValidate(PhysicsSystem system, in Body body1, in Body body2, Vector3 baseOffset, IntPtr collisionResult)
     {
-        Console.WriteLine("Contact validate callback");
+        Log($"Contact validate callback {baseOffset}");
 
         // Allows you to ignore a contact before it is created (using layers to not make objects collide is cheaper!)
         return ValidateResult.AcceptAllContactsForThisBodyPair;
@@ -280,26 +282,31 @@ public static class Program
 
     private static void OnContactAdded(PhysicsSystem system, in Body body1, in Body body2)
     {
-        Console.WriteLine("A contact was added");
+        Log("A contact was added");
     }
 
     private static void OnContactPersisted(PhysicsSystem system, in Body body1, in Body body2)
     {
-        Console.WriteLine("A contact was persisted");
+        Log("A contact was persisted");
     }
 
     private static void OnContactRemoved(PhysicsSystem system, ref SubShapeIDPair subShapePair)
     {
-        Console.WriteLine("A contact was removed");
+        Log("A contact was removed");
     }
 
     private static void OnBodyActivated(PhysicsSystem system, in BodyID bodyID, ulong bodyUserData)
     {
-        Console.WriteLine("A body got activated");
+        Log("A body got activated");
     }
 
     private static void OnBodyDeactivated(PhysicsSystem system, in BodyID bodyID, ulong bodyUserData)
     {
-        Console.WriteLine("A body went to sleep");
+        Log("A body went to sleep");
+    }
+
+    private static void Log(string str)
+    {
+        Console.WriteLine(string.Format("[{0}] {1}" , m_logCount++,str));
     }
 }

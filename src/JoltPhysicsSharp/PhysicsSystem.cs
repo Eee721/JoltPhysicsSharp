@@ -1,4 +1,4 @@
-// Copyright © Amer Koleci and Contributors.
+// Copyright ?Amer Koleci and Contributors.
 // Licensed under the MIT License (MIT). See LICENSE in the repository root for more information.
 
 using System.Numerics;
@@ -26,19 +26,28 @@ public sealed class PhysicsSystem : NativeObject
 
     static unsafe PhysicsSystem()
     {
+        var OnContactValidateCallbackPtr = Marshal.GetFunctionPointerForDelegate(new OnContactValidateDelegate(OnContactValidateCallback));
+        var OnContactAddedCallbackPtr = Marshal.GetFunctionPointerForDelegate(new OnContactAddedDelegate(OnContactAddedCallback));
+        var OnContactPersistedCallbackPtr = Marshal.GetFunctionPointerForDelegate(new OnContactPersistedDelegate(OnContactPersistedCallback));
+        var OnContactRemovedCallbackPtr = Marshal.GetFunctionPointerForDelegate(new OnContactRemovedDelegate(OnContactRemovedCallback));
+
         s_contactListener_Procs = new JPH_ContactListener_Procs
         {
-            OnContactValidate = &OnContactValidateCallback,
-            OnContactAdded = &OnContactAddedCallback,
-            OnContactPersisted = &OnContactPersistedCallback,
-            OnContactRemoved = &OnContactRemovedCallback
+            OnContactValidate = OnContactValidateCallbackPtr,
+            OnContactAdded = OnContactAddedCallbackPtr,
+            OnContactPersisted = OnContactPersistedCallbackPtr,
+            OnContactRemoved = OnContactRemovedCallbackPtr
         };
         JPH_ContactListener_SetProcs(s_contactListener_Procs);
 
+
+        var OnBodyActivatedCallbackPtr = Marshal.GetFunctionPointerForDelegate(new OnBodyActivatedDelegate(OnBodyActivatedCallback));
+        var OnBodyDeactivatedCallbackPtr = Marshal.GetFunctionPointerForDelegate(new OnBodyDeactivatedDelegate(OnBodyDeactivatedCallback));
+
         s_BodyActivationListener_Procs = new JPH_BodyActivationListener_Procs
         {
-            OnBodyActivated = &OnBodyActivatedCallback,
-            OnBodyDeactivated = &OnBodyDeactivatedCallback
+            OnBodyActivated = OnBodyActivatedCallbackPtr,
+            OnBodyDeactivated = OnBodyDeactivatedCallbackPtr
         };
         JPH_BodyActivationListener_SetProcs(s_BodyActivationListener_Procs);
     }
@@ -214,7 +223,7 @@ public sealed class PhysicsSystem : NativeObject
     }
 
     #region ContactListener
-    [UnmanagedCallersOnly(CallConvs = new[] { typeof(CallConvCdecl) })]
+    //[UnmanagedCallersOnly(CallConvs = new[] { typeof(CallConvCdecl) })]
     private static unsafe ValidateResult OnContactValidateCallback(IntPtr listenerPtr, IntPtr body1, IntPtr body2, Vector3* baseOffset, IntPtr collisionResult)
     {
         PhysicsSystem listener = s_contactListeners[listenerPtr];
@@ -227,21 +236,21 @@ public sealed class PhysicsSystem : NativeObject
         return ValidateResult.AcceptAllContactsForThisBodyPair;
     }
 
-    [UnmanagedCallersOnly(CallConvs = new[] { typeof(CallConvCdecl) })]
+    //[UnmanagedCallersOnly(CallConvs = new[] { typeof(CallConvCdecl) })]
     private static void OnContactAddedCallback(IntPtr listenerPtr, IntPtr body1, IntPtr body2)
     {
         PhysicsSystem listener = s_contactListeners[listenerPtr];
         listener.OnContactAdded?.Invoke(listener, new Body(body1), new Body(body2));
     }
 
-    [UnmanagedCallersOnly(CallConvs = new[] { typeof(CallConvCdecl) })]
+    //[UnmanagedCallersOnly(CallConvs = new[] { typeof(CallConvCdecl) })]
     private static void OnContactPersistedCallback(IntPtr listenerPtr, IntPtr body1, IntPtr body2)
     {
         PhysicsSystem listener = s_contactListeners[listenerPtr];
         listener.OnContactPersisted?.Invoke(listener, new Body(body1), new Body(body2));
     }
 
-    [UnmanagedCallersOnly(CallConvs = new[] { typeof(CallConvCdecl) })]
+    //[UnmanagedCallersOnly(CallConvs = new[] { typeof(CallConvCdecl) })]
     private unsafe static void OnContactRemovedCallback(IntPtr listenerPtr, SubShapeIDPair* subShapePair)
     {
         PhysicsSystem listener = s_contactListeners[listenerPtr];
@@ -250,14 +259,14 @@ public sealed class PhysicsSystem : NativeObject
     #endregion ContactListener
 
     #region BodyActivationListener
-    [UnmanagedCallersOnly(CallConvs = new[] { typeof(CallConvCdecl) })]
+    //[UnmanagedCallersOnly(CallConvs = new[] { typeof(CallConvCdecl) })]
     private static void OnBodyActivatedCallback(IntPtr listenerPtr, uint bodyID, ulong bodyUserData)
     {
         PhysicsSystem listener = s_bodyActivationListenerListeners[listenerPtr];
         listener.OnBodyActivated?.Invoke(listener, bodyID, bodyUserData);
     }
 
-    [UnmanagedCallersOnly(CallConvs = new[] { typeof(CallConvCdecl) })]
+    //[UnmanagedCallersOnly(CallConvs = new[] { typeof(CallConvCdecl) })]
     private static void OnBodyDeactivatedCallback(IntPtr listenerPtr, uint bodyID, ulong bodyUserData)
     {
         PhysicsSystem listener = s_bodyActivationListenerListeners[listenerPtr];

@@ -1,4 +1,4 @@
-// Copyright © Amer Koleci and Contributors.
+// Copyright ?Amer Koleci and Contributors.
 // Licensed under the MIT License (MIT). See LICENSE in the repository root for more information.
 
 using System.Runtime.CompilerServices;
@@ -12,11 +12,14 @@ public abstract class ObjectLayerPairFilter : NativeObject
     private static readonly Dictionary<IntPtr, ObjectLayerPairFilter> s_listeners = new();
     private static JPH_ObjectLayerPairFilter_Procs s_ObjectLayerPairFilter_Procs;
 
+    public delegate uint ShouldCollideDelegate(IntPtr a, ObjectLayer b, ObjectLayer c);
     static unsafe ObjectLayerPairFilter()
     {
+        var callbackDelegate = new ShouldCollideDelegate(ShouldCollideCallback);
+        var callbackPointer = Marshal.GetFunctionPointerForDelegate(callbackDelegate);
         s_ObjectLayerPairFilter_Procs = new JPH_ObjectLayerPairFilter_Procs
         {
-            ShouldCollide = &ShouldCollideCallback
+            ShouldCollide = callbackPointer
         };
         JPH_ObjectLayerPairFilter_SetProcs(s_ObjectLayerPairFilter_Procs);
     }
@@ -44,9 +47,10 @@ public abstract class ObjectLayerPairFilter : NativeObject
 
     protected abstract bool ShouldCollide(ObjectLayer object1, ObjectLayer object2);
 
-    [UnmanagedCallersOnly(CallConvs = new[] { typeof(CallConvCdecl) })]
+    //[UnmanagedCallersOnly(CallConvs = new[] { typeof(CallConvCdecl) })]
     private static uint ShouldCollideCallback(IntPtr listenerPtr, ObjectLayer object1, ObjectLayer object2)
     {
+        //return 1u;
         ObjectLayerPairFilter listener = s_listeners[listenerPtr];
         return listener.ShouldCollide(object1, object2) ? 1u : 0u;
     }

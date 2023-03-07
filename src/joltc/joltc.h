@@ -253,6 +253,7 @@ JPH_CAPI JPH_BodyCreationSettings* JPH_BodyCreationSettings_Create3(JPH_Shape* s
     JPH_MotionType motionType,
     JPH_ObjectLayer objectLayer);
 JPH_CAPI void JPH_BodyCreationSettings_Destroy(JPH_BodyCreationSettings* settings);
+JPH_CAPI void JPH_BodyCreationSettings_SetMass(JPH_BodyCreationSettings* settings , float mass , float inertiaMultiplier);
 
 /* JPH_ConstraintSettings */
 JPH_CAPI void JPH_ConstraintSettings_Destroy(JPH_ConstraintSettings* settings);
@@ -338,7 +339,7 @@ JPH_CAPI JPH_Bool32 JPH_Body_IsStatic(const JPH_Body* body);
 JPH_CAPI JPH_Bool32 JPH_Body_IsKinematic(const JPH_Body* body);
 JPH_CAPI JPH_Bool32 JPH_Body_IsDynamic(const JPH_Body* body);
 JPH_CAPI JPH_Bool32 JPH_Body_IsSensor(const JPH_Body* body);
-JPH_CAPI JPH_MotionType JPH_Body_GetMotionType(const JPH_Body* body);
+JPH_CAPI JPH_MotionType JPH_Body_GetMotionType   (const JPH_Body* body);
 JPH_CAPI void JPH_Body_SetMotionType(JPH_Body* body, JPH_MotionType motionType);
 JPH_CAPI float JPH_Body_GetFriction(const JPH_Body* body);
 JPH_CAPI void JPH_Body_SetFriction(JPH_Body* body, float friction);

@@ -597,6 +597,14 @@ void JPH_BodyCreationSettings_Destroy(JPH_BodyCreationSettings* settings)
     }
 }
 
+JPH_CAPI void JPH_BodyCreationSettings_SetMass(JPH_BodyCreationSettings* settings, float mass, float inertiaMultiplier)
+{
+    auto bs = reinterpret_cast<JPH::BodyCreationSettings*>(settings);
+    bs->mInertiaMultiplier = inertiaMultiplier;
+    bs->mMassPropertiesOverride.mMass = mass;
+    bs->mOverrideMassProperties = EOverrideMassProperties::CalculateInertia;
+}
+
 /* JPH_ConstraintSettings */
 void JPH_ConstraintSettings_Destroy(JPH_ConstraintSettings* settings)
 {

@@ -1,4 +1,4 @@
-// Copyright © Amer Koleci and Contributors.
+// Copyright ?Amer Koleci and Contributors.
 // Licensed under the MIT License (MIT). See LICENSE in the repository root for more information.
 
 using System.Runtime.CompilerServices;
@@ -12,11 +12,14 @@ public abstract class ObjectVsBroadPhaseLayerFilter : NativeObject
     private static readonly Dictionary<IntPtr, ObjectVsBroadPhaseLayerFilter> s_listeners = new();
     private static JPH_ObjectVsBroadPhaseLayerFilter_Procs s_ObjectVsBroadPhaseLayerFilter_Procs;
 
+    public delegate uint ShouldCollideDelegate(IntPtr a, ObjectLayer b, BroadPhaseLayer c);
     static unsafe ObjectVsBroadPhaseLayerFilter()
     {
+        var callbackDelegate = new ShouldCollideDelegate(ShouldCollideCallback);
+        var callbackPointer = Marshal.GetFunctionPointerForDelegate(callbackDelegate);
         s_ObjectVsBroadPhaseLayerFilter_Procs = new JPH_ObjectVsBroadPhaseLayerFilter_Procs
         {
-            ShouldCollide = &ShouldCollideCallback
+            ShouldCollide = callbackPointer
         };
         JPH_ObjectVsBroadPhaseLayerFilter_SetProcs(s_ObjectVsBroadPhaseLayerFilter_Procs);
     }
@@ -44,7 +47,7 @@ public abstract class ObjectVsBroadPhaseLayerFilter : NativeObject
 
     protected abstract bool ShouldCollide(ObjectLayer layer1, BroadPhaseLayer layer2);
 
-    [UnmanagedCallersOnly(CallConvs = new[] { typeof(CallConvCdecl) })]
+    //[UnmanagedCallersOnly(CallConvs = new[] { typeof(CallConvCdecl) })]
     private static uint ShouldCollideCallback(IntPtr listenerPtr, ObjectLayer layer1, BroadPhaseLayer layer2)
     {
         ObjectVsBroadPhaseLayerFilter listener = s_listeners[listenerPtr];

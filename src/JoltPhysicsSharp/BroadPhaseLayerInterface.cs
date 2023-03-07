@@ -1,4 +1,4 @@
-// Copyright © Amer Koleci and Contributors.
+// Copyright ?Amer Koleci and Contributors.
 // Licensed under the MIT License (MIT). See LICENSE in the repository root for more information.
 
 using System.Runtime.CompilerServices;
@@ -13,12 +13,15 @@ public abstract class BroadPhaseLayerInterface : NativeObject
     private static JPH_BroadPhaseLayerInterface_Procs s_broadPhaseLayerInterface_Procs;
 
     static unsafe BroadPhaseLayerInterface()
-    {
+    {        
+        var GetNumBroadPhaseLayersCallbackPtr = Marshal.GetFunctionPointerForDelegate(new GetNumBroadPhaseLayersDelegate(GetNumBroadPhaseLayersCallback));
+        var GetBroadPhaseLayerCallbackPtr = Marshal.GetFunctionPointerForDelegate(new GetBroadPhaseLayerDelegate(GetBroadPhaseLayerCallback));
+        var GetBroadPhaseLayerNameCallbackPtr = Marshal.GetFunctionPointerForDelegate(new GetBroadPhaseLayerNameDelegate(GetBroadPhaseLayerNameCallback));
         s_broadPhaseLayerInterface_Procs = new JPH_BroadPhaseLayerInterface_Procs
         {
-            GetNumBroadPhaseLayers = &GetNumBroadPhaseLayersCallback,
-            GetBroadPhaseLayer = &GetBroadPhaseLayerCallback,
-            GetBroadPhaseLayerName= &GetBroadPhaseLayerNameCallback
+            GetNumBroadPhaseLayers = GetNumBroadPhaseLayersCallbackPtr,
+            GetBroadPhaseLayer = GetBroadPhaseLayerCallbackPtr,
+            GetBroadPhaseLayerName= GetBroadPhaseLayerNameCallbackPtr
         };
         JPH_BroadPhaseLayerInterface_SetProcs(s_broadPhaseLayerInterface_Procs);
     }
@@ -48,21 +51,21 @@ public abstract class BroadPhaseLayerInterface : NativeObject
     protected abstract BroadPhaseLayer GetBroadPhaseLayer(ObjectLayer layer);
     protected abstract string GetBroadPhaseLayerName(BroadPhaseLayer layer);
 
-    [UnmanagedCallersOnly(CallConvs = new[] { typeof(CallConvCdecl) })]
+    //[UnmanagedCallersOnly(CallConvs = new[] { typeof(CallConvCdecl) })]
     private static uint GetNumBroadPhaseLayersCallback(IntPtr listenerPtr)
     {
         BroadPhaseLayerInterface listener = s_listeners[listenerPtr];
         return (uint)listener.GetNumBroadPhaseLayers();
     }
 
-    [UnmanagedCallersOnly(CallConvs = new[] { typeof(CallConvCdecl) })]
+    //[UnmanagedCallersOnly(CallConvs = new[] { typeof(CallConvCdecl) })]
     private static BroadPhaseLayer GetBroadPhaseLayerCallback(IntPtr listenerPtr, ObjectLayer layer)
     {
         BroadPhaseLayerInterface listener = s_listeners[listenerPtr];
         return listener.GetBroadPhaseLayer(layer);
     }
 
-    [UnmanagedCallersOnly(CallConvs = new[] { typeof(CallConvCdecl) })]
+    //[UnmanagedCallersOnly(CallConvs = new[] { typeof(CallConvCdecl) })]
     private static unsafe IntPtr GetBroadPhaseLayerNameCallback(IntPtr listenerPtr, BroadPhaseLayer layer)
     {
         BroadPhaseLayerInterface listener = s_listeners[listenerPtr];

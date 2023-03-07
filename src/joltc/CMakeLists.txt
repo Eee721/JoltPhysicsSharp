@@ -7,6 +7,9 @@ set(SOURCE_FILES
     joltc_assert.cpp
 )
 
+# Make Jolt Library
+# include(${CMAKE_CURRENT_SOURCE_DIR}/Jolt/Jolt.cmake)
+
 add_library(${TARGET_NAME} ${SOURCE_FILES})
 target_link_libraries(${TARGET_NAME} PUBLIC Jolt)
 

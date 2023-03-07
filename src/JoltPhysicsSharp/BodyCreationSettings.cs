@@ -1,4 +1,4 @@
-// Copyright © Amer Koleci and Contributors.
+// Copyright ?Amer Koleci and Contributors.
 // Licensed under the MIT License (MIT). See LICENSE in the repository root for more information.
 
 using System.Numerics;
@@ -21,6 +21,11 @@ public sealed class BodyCreationSettings : NativeObject
     public BodyCreationSettings(Shape shape, in Vector3 position, in Quaternion rotation, MotionType motionType, ObjectLayer objectLayer)
        : base(JPH_BodyCreationSettings_Create3(shape.Handle, position, rotation, motionType, objectLayer))
     {
+    }
+
+    public void SetMass(float mass, float inertiaMultiplier)
+    {
+        JPH_BodyCreationSettings_SetMass(Handle, mass, inertiaMultiplier);
     }
 
     /// <summary>

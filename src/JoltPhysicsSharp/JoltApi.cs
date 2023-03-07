@@ -1,4 +1,4 @@
-// Copyright © Amer Koleci and Contributors.
+// Copyright ?Amer Koleci and Contributors.
 // Licensed under the MIT License (MIT). See LICENSE in the repository root for more information.
 
 using System.Numerics;
@@ -110,12 +110,18 @@ internal static unsafe partial class JoltApi
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_JobSystemThreadPool_Destroy(IntPtr handle);
 
+    public delegate uint GetNumBroadPhaseLayersDelegate(IntPtr a) ;
+    public delegate BroadPhaseLayer GetBroadPhaseLayerDelegate(IntPtr a, ObjectLayer b);
+    public delegate IntPtr GetBroadPhaseLayerNameDelegate(IntPtr a, BroadPhaseLayer b);
     //  BroadPhaseLayerInterface
     public struct JPH_BroadPhaseLayerInterface_Procs
     {
-        public delegate* unmanaged[Cdecl]<IntPtr, uint> GetNumBroadPhaseLayers;
-        public delegate* unmanaged[Cdecl]<IntPtr, ObjectLayer, BroadPhaseLayer> GetBroadPhaseLayer;
-        public delegate* unmanaged[Cdecl]<IntPtr, BroadPhaseLayer, IntPtr> GetBroadPhaseLayerName;
+        //public delegate* unmanaged[Cdecl]<IntPtr, uint> GetNumBroadPhaseLayers;
+        //public delegate* unmanaged[Cdecl]<IntPtr, ObjectLayer, BroadPhaseLayer> GetBroadPhaseLayer;
+        //public delegate* unmanaged[Cdecl]<IntPtr, BroadPhaseLayer, IntPtr> GetBroadPhaseLayerName;
+        public IntPtr GetNumBroadPhaseLayers;
+        public IntPtr GetBroadPhaseLayer;
+        public IntPtr GetBroadPhaseLayerName;
     }
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
@@ -130,7 +136,8 @@ internal static unsafe partial class JoltApi
     //  ObjectVsBroadPhaseLayerFilter
     public struct JPH_ObjectVsBroadPhaseLayerFilter_Procs
     {
-        public delegate* unmanaged[Cdecl]<IntPtr, ObjectLayer, BroadPhaseLayer, uint> ShouldCollide;
+        public IntPtr ShouldCollide;
+        //public delegate* unmanaged[Cdecl]<IntPtr, ObjectLayer, BroadPhaseLayer, uint> ShouldCollide;
     }
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
@@ -145,7 +152,8 @@ internal static unsafe partial class JoltApi
     //  ObjectLayerPairFilter
     public struct JPH_ObjectLayerPairFilter_Procs
     {
-        public delegate* unmanaged[Cdecl]<IntPtr, ObjectLayer, ObjectLayer, uint> ShouldCollide;
+        //public delegate* unmanaged[Cdecl]<IntPtr, ObjectLayer, ObjectLayer, uint> ShouldCollide;
+        public IntPtr ShouldCollide;
     }
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
@@ -247,6 +255,10 @@ internal static unsafe partial class JoltApi
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern IntPtr JPH_BodyCreationSettings_Create3(IntPtr shape, in Vector3 position, in Quaternion rotation, MotionType motionType, ushort objectLayer);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern IntPtr JPH_BodyCreationSettings_SetMass(IntPtr setting , float mass, float inertiaMultiplier);
+
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_BodyCreationSettings_Destroy(IntPtr settings);
@@ -497,13 +509,22 @@ internal static unsafe partial class JoltApi
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_Body_AddAngularImpulse(IntPtr handle, in Vector3 angularImpulse);
 
+
+    public delegate ValidateResult OnContactValidateDelegate(IntPtr a, IntPtr b, IntPtr c, Vector3* d, IntPtr e);
+    public delegate void OnContactAddedDelegate(IntPtr a, IntPtr b, IntPtr c);
+    public delegate void OnContactPersistedDelegate(IntPtr a, IntPtr b, IntPtr c);
+    public delegate void OnContactRemovedDelegate(IntPtr a, SubShapeIDPair* b);
     // ContactListener
     public struct JPH_ContactListener_Procs
     {
-        public delegate* unmanaged[Cdecl]<IntPtr, IntPtr, IntPtr, Vector3*, IntPtr, ValidateResult> OnContactValidate;
-        public delegate* unmanaged[Cdecl]<IntPtr, IntPtr, IntPtr, void> OnContactAdded;
-        public delegate* unmanaged[Cdecl]<IntPtr, IntPtr, IntPtr, void> OnContactPersisted;
-        public delegate* unmanaged[Cdecl]<IntPtr, SubShapeIDPair*, void> OnContactRemoved;
+        //public delegate* unmanaged[Cdecl]<IntPtr, IntPtr, IntPtr, Vector3*, IntPtr, ValidateResult> OnContactValidate;
+        //public delegate* unmanaged[Cdecl]<IntPtr, IntPtr, IntPtr, void> OnContactAdded;
+        //public delegate* unmanaged[Cdecl]<IntPtr, IntPtr, IntPtr, void> OnContactPersisted;
+        //public delegate* unmanaged[Cdecl]<IntPtr, SubShapeIDPair*, void> OnContactRemoved;
+        public IntPtr OnContactValidate;
+        public IntPtr OnContactAdded;
+        public IntPtr OnContactPersisted;
+        public IntPtr OnContactRemoved;
     }
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
@@ -515,11 +536,15 @@ internal static unsafe partial class JoltApi
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_ContactListener_Destroy(IntPtr handle);
 
+    public delegate void OnBodyActivatedDelegate(IntPtr a, uint b, ulong c);
+    public delegate void OnBodyDeactivatedDelegate(IntPtr a, uint b, ulong c);
     // BodyActivationListener
     public struct JPH_BodyActivationListener_Procs
     {
-        public delegate* unmanaged[Cdecl]<IntPtr, uint, ulong, void> OnBodyActivated;
-        public delegate* unmanaged[Cdecl]<IntPtr, uint, ulong, void> OnBodyDeactivated;
+        //public delegate* unmanaged[Cdecl]<IntPtr, uint, ulong, void> OnBodyActivated;
+        //public delegate* unmanaged[Cdecl]<IntPtr, uint, ulong, void> OnBodyDeactivated;
+        public IntPtr OnBodyActivated;
+        public IntPtr OnBodyDeactivated;
     }
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
